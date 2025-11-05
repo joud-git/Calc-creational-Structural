@@ -2,10 +2,10 @@ package Calc;
 
 public final class OperationFactory {
 
-    private static boolean enableLogging = false;
+    private static boolean enableLogging = true;  
     private static boolean enableRounding = false;
     private static int roundingScale = 2;
-    private static boolean enableValidation = false;
+    private static boolean enableValidation = true;  
 
     private OperationFactory() {}
 
@@ -33,14 +33,17 @@ public final class OperationFactory {
     }
     
     private static Operation applyDecorators(Operation operation, String symbol) {
+        // Apply validation first (innermost decorator)
         if (enableValidation && (symbol.equals("/") || symbol.equals("÷"))) {
             operation = new ValidatedDivideOperation(operation);
         }
         
+        // Then apply rounding
         if (enableRounding) {
             operation = new RoundingOperation(operation, roundingScale);
         }
         
+        // Apply logging last (outermost decorator) so it logs the final result
         if (enableLogging) {
             operation = new LoggingOperation(operation);
         }
@@ -62,5 +65,21 @@ public final class OperationFactory {
     
     public static void setValidationEnabled(boolean enabled) {
         enableValidation = enabled;
+    }
+    
+    public static boolean isLoggingEnabled() {
+        return enableLogging;
+    }
+    
+    public static boolean isRoundingEnabled() {
+        return enableRounding;
+    }
+    
+    public static boolean isValidationEnabled() {
+        return enableValidation;
+    }
+    
+    public static int getRoundingScale() {
+        return roundingScale;
     }
 }
