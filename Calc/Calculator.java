@@ -42,7 +42,7 @@ public final class Calculator extends javax.swing.JFrame {
             });
         }
 
-        // Hover effects (كما هو عندك)
+        // Hover effects 
         for (JButton btn : btns) {
             btn.addMouseListener(new MouseAdapter() {
 
@@ -151,7 +151,7 @@ public final class Calculator extends javax.swing.JFrame {
         this.updateDisplay();
     }
 
-    // ======== NEW helper methods used by external Command classes ========
+    // helper methods used by external Command classes 
 
     public void deleteLastDigit() {
         if (this.currentOperand != null && !this.currentOperand.equals("")) {
