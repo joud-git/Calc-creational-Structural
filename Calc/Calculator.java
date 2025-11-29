@@ -12,100 +12,6 @@ public final class Calculator extends javax.swing.JFrame {
 
     private int x, y;
 
-    /* Command Pattern application */
-
-    // Command interface
-    private interface Command {
-        void execute();
-    }
-
-    // Concrete command entering numbers
-    private class NumberCommand implements Command {
-        private final String digit;
-
-        NumberCommand(String digit) {
-            this.digit = digit;
-        }
-
-        @Override
-        public void execute() {
-            appendNumber(digit);
-        }
-    }
-
-    // Concrete command choosing operation
-    private class OperationCommand implements Command {
-        private final String opSymbol;
-
-        OperationCommand(String opSymbol) {
-            this.opSymbol = opSymbol;
-        }
-
-        @Override
-        public void execute() {
-            chooseOperation(opSymbol);
-        }
-    }
-
-    // Concrete command equals
-    private class EqualCommand implements Command {
-        @Override
-        public void execute() {
-            compute();
-        }
-    }
-
-    // Concrete command clear
-    private class ClearCommand implements Command {
-        @Override
-        public void execute() {
-            clear();
-        }
-    }
-
-    // Concrete command delete last digit
-    private class DeleteCommand implements Command {
-        @Override
-        public void execute() {
-            if (!currentOperand.equals("")) {
-                currentOperand = currentOperand.substring(0, currentOperand.length() - 1);
-                updateDisplay();
-            }
-        }
-    }
-
-    // Concrete command toggle sign
-    private class ToggleSignCommand implements Command {
-        @Override
-        public void execute() {
-            if (!currentOperand.isBlank()) {
-                double tmp = -Double.parseDouble(currentOperand);
-
-                if (tmp == Math.rint(tmp)) {
-                    currentOperand = Long.toString((long) tmp);
-                } else {
-                    currentOperand = Double.toString(tmp);
-                }
-                updateDisplay();
-            }
-        }
-    }
-
-    // Concrete command decimal point
-    private class DotCommand implements Command {
-        @Override
-        public void execute() {
-
-            if (currentOperand.isBlank()) {
-                appendNumber("0.");
-            } else {
-                appendNumber(".");
-            }
-        }
-    }
-
-    /* End Of Command */
-
     public Calculator() {
         initComponents();
         getContentPane().setSize(400, 700);
@@ -131,11 +37,12 @@ public final class Calculator extends javax.swing.JFrame {
         for (JButton number : numbers) {
             number.addActionListener((ActionEvent e) -> {
                 String digit = ((JButton) e.getSource()).getText();
-                Command cmd = new NumberCommand(digit);
+                Command cmd = new NumberCommand(this, digit);
                 cmd.execute();
             });
         }
 
+        // Hover effects (كما هو عندك)
         for (JButton btn : btns) {
             btn.addMouseListener(new MouseAdapter() {
 
@@ -147,8 +54,8 @@ public final class Calculator extends javax.swing.JFrame {
                 @Override
                 public void mouseExited(MouseEvent e) {
                     Object b = e.getSource();
-                    if (b == btnDiv || b == btnEqual || b == btnDel || b == btnMult || b == btnSub || b == btnPlus
-                            || b == btnClear) {
+                    if (b == btnDiv || b == btnEqual || b == btnDel || b == btnMult
+                            || b == btnSub || b == btnPlus || b == btnClear) {
                         ((JButton) b).setBackground(new Color(41, 39, 44));
                     } else {
                         ((JButton) b).setBackground(new Color(21, 20, 22));
@@ -157,8 +64,7 @@ public final class Calculator extends javax.swing.JFrame {
             });
         }
     }
-
-    public void clear() {
+   public void clear() {
         this.currentOperand = "";
         this.previousOperand = "";
         this.operation = "";
@@ -243,6 +149,36 @@ public final class Calculator extends javax.swing.JFrame {
         this.previousOperand = "";
         this.operation = "";
         this.updateDisplay();
+    }
+
+    // ======== NEW helper methods used by external Command classes ========
+
+    public void deleteLastDigit() {
+        if (this.currentOperand != null && !this.currentOperand.equals("")) {
+            this.currentOperand = this.currentOperand.substring(0, this.currentOperand.length() - 1);
+            this.updateDisplay();
+        }
+    }
+
+    public void toggleSign() {
+        if (this.currentOperand != null && !this.currentOperand.isBlank()) {
+            double tmp = -Double.parseDouble(this.currentOperand);
+
+            if (tmp == Math.rint(tmp)) {
+                this.currentOperand = Long.toString((long) tmp);
+            } else {
+                this.currentOperand = Double.toString(tmp);
+            }
+            this.updateDisplay();
+        }
+    }
+
+    public void handleDot() {
+        if (this.currentOperand == null || this.currentOperand.isBlank()) {
+            appendNumber("0.");
+        } else {
+            appendNumber(".");
+        }
     }
 
     public void updateDisplay() {
@@ -821,50 +757,50 @@ public final class Calculator extends javax.swing.JFrame {
 
     /* Event Handler Using command */
 
-    private void btnDotActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDotActionPerformed
-        Command cmd = new DotCommand();
+   private void btnDotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDotActionPerformed
+        Command cmd = new DotCommand(this);
         cmd.execute();
-    }// GEN-LAST:event_btnDotActionPerformed
+    }//GEN-LAST:event_btnDotActionPerformed
 
-    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnClearActionPerformed
-        Command cmd = new ClearCommand();
+    private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
+        Command cmd = new ClearCommand(this);
         cmd.execute();
-    }// GEN-LAST:event_btnClearActionPerformed
+    }//GEN-LAST:event_btnClearActionPerformed
 
-    private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDelActionPerformed
-        Command cmd = new DeleteCommand();
+    private void btnDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDelActionPerformed
+        Command cmd = new DeleteCommand(this);
         cmd.execute();
-    }// GEN-LAST:event_btnDelActionPerformed
+    }//GEN-LAST:event_btnDelActionPerformed
 
-    private void btnPlusActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnPlusActionPerformed
-        Command cmd = new OperationCommand("+");
+    private void btnPlusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlusActionPerformed
+        Command cmd = new OperationCommand(this, "+");
         cmd.execute();
-    }// GEN-LAST:event_btnPlusActionPerformed
+    }//GEN-LAST:event_btnPlusActionPerformed
 
-    private void btnMultActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnMultActionPerformed
-        Command cmd = new OperationCommand("×");
+    private void btnMultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMultActionPerformed
+        Command cmd = new OperationCommand(this, "×");
         cmd.execute();
-    }// GEN-LAST:event_btnMultActionPerformed
+    }//GEN-LAST:event_btnMultActionPerformed
 
-    private void btnSubActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnSubActionPerformed
-        Command cmd = new OperationCommand("-");
+    private void btnSubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubActionPerformed
+        Command cmd = new OperationCommand(this, "-");
         cmd.execute();
-    }// GEN-LAST:event_btnSubActionPerformed
+    }//GEN-LAST:event_btnSubActionPerformed
 
-    private void btnDivActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDivActionPerformed
-        Command cmd = new OperationCommand("÷");
+    private void btnDivActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDivActionPerformed
+        Command cmd = new OperationCommand(this, "÷");
         cmd.execute();
-    }// GEN-LAST:event_btnDivActionPerformed
+    }//GEN-LAST:event_btnDivActionPerformed
 
-    private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnEqualActionPerformed
-        Command cmd = new EqualCommand();
+    private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEqualActionPerformed
+        Command cmd = new EqualCommand(this);
         cmd.execute();
-    }// GEN-LAST:event_btnEqualActionPerformed
+    }//GEN-LAST:event_btnEqualActionPerformed
 
-    private void btnPlusSubActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnPlusSubActionPerformed
-        Command cmd = new ToggleSignCommand();
+    private void btnPlusSubActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlusSubActionPerformed
+        Command cmd = new ToggleSignCommand(this);
         cmd.execute();
-    }// GEN-LAST:event_btnPlusSubActionPerformed
+    }//GEN-LAST:event_btnPlusSubActionPerformed
 
     private void btnMiniMouseEntered(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_btnMiniMouseEntered
         btnMini.setBackground(new java.awt.Color(72, 72, 72));
