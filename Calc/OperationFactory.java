@@ -2,36 +2,45 @@ package Calc;
 
 public final class OperationFactory {
 
+    // Decorator configuration flags
     private static boolean enableLogging = true;  
     private static boolean enableRounding = false;
     private static int roundingScale = 2;
     private static boolean enableValidation = true;  
 
+    // Private constructor prevents instantiation (utility class)
     private OperationFactory() {}
-
+  
     public static Operation of(String symbol) {
         if (symbol == null) return null;
         
+        // Step 1: Create the base strategy using Factory Pattern
         Operation operation = createBaseOperation(symbol);
         if (operation == null) return null;
         
+        // Step 2: Apply decorators based on configuration
         operation = applyDecorators(operation, symbol);
         
         return operation;
     }
-    
+ 
     private static Operation createBaseOperation(String symbol) {
         switch (symbol) {
-            case "+": return new AddOperation();
-            case "-": return new SubOperation();
+            case "+": 
+                return new AddOperation();
+            case "-": 
+                return new SubOperation();
             case "*":
-            case "×": return new MulOperation();
+            case "×": 
+                return new MulOperation();
             case "/":
-            case "÷": return new DivOperation();
-            default:  return null;
+            case "÷": 
+                return new DivOperation();
+            default:  
+                return null;
         }
     }
-    
+   
     private static Operation applyDecorators(Operation operation, String symbol) {
         // Apply validation first (innermost decorator)
         if (enableValidation && (symbol.equals("/") || symbol.equals("÷"))) {
@@ -50,6 +59,8 @@ public final class OperationFactory {
         
         return operation;
     }
+    
+    // Configuration methods for decorators
     
     public static void setLoggingEnabled(boolean enabled) {
         enableLogging = enabled;

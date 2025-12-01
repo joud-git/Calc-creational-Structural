@@ -7,7 +7,8 @@ public final class LoggingOperation extends OperationDecorator {
 
     @Override
     public double apply(double a, double b) {
-        System.out.println("[LOG] Executing operation: " + delegate.getClass().getSimpleName());
+        // Use metadata methods instead of getClass().getSimpleName()
+        System.out.println("[LOG] Executing operation: " + getName() + " (" + getSymbol() + ")");
         System.out.println("[LOG] Operands: a=" + a + ", b=" + b);
         double result = super.apply(a, b);
         System.out.println("[LOG] Result: " + result);
